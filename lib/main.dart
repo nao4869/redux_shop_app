@@ -1,63 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:redux_shop_app/app_routes.dart';
 
 void main() => runApp(MyApp());
 
+final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
+  final store = Store<AppState>(appReducer,
+      initialState: AppState.loading(),
+      middleware: createNavigationMiddleware());
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  final theme = ThemeData(
+    primaryColor: Colors.grey.shade900,
+    primaryColorLight: Colors.grey.shade800,
+    primaryColorDark: Colors.black,
+    scaffoldBackgroundColor: Colors.grey.shade800,
+    iconTheme: IconThemeData(color: Colors.white),
+    accentColor: Colors.yellow[500],
+  );
 
-  final String title;
+  MaterialPageRoute _getRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case AppRoutes.home:
+        return MainRoute(MyHomePage(), settings: settings);
+      case AppRoutes.listSchools:
+        return FabRoute(NewGame(), settings: settings);
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
+    return StoreProvider(
+      store: store,
+      child: MaterialApp(
+        navigatorKey: navigatorKey, // navigator key allows us to navigate without need of context
+        navigatorObservers: [routeObserver],
+        title: AppLocalizations.appTitle,
+        localizationsDelegates: [
+          AppLocalizationsDelegate(),
+        ],
+        theme: theme,
+        onGenerateRoute: (RouteSettings settings) => _getRoute(settings),
       ),
     );
   }
