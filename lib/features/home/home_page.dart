@@ -9,18 +9,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<SchoolListItem> _games;
+  List<SchoolListItem> schools;
 
   _HomePageState() {
-    var games = TestData.getRandomGames(20);
-    games.sort((a, b) => a.date.compareTo(b.date));
-    _games = games.map((game) => GameListItem(game))
+    var schools = TestData.getRandomGames(20);
+    schools.sort((a, b) => a.date.compareTo(b.date));
+    schools = schools.map((sc) => SchoolListItem(sc))
         .toList();
   }
 
   Widget _getBody() => ListView.builder(
-        itemBuilder: (BuildContext context, int index) => _games[index],
-        itemCount: _games.length,
+        itemBuilder: (BuildContext context, int index) => schools[index],
+        itemCount: schools.length,
       );
 
   @override
