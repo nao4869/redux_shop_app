@@ -3,6 +3,16 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_shop_app/app_routes.dart';
 
+import 'package:redux_shop_app/redux/app_state.dart';
+import 'package:redux_shop_app/redux/reducers/app_reducer.dart';
+import 'package:redux_shop_app/route_aware_widget.dart';
+import 'package:redux_shop_app/redux/navigation_middleware.dart';
+
+import 'package:redux_shop_app/features/home/home_page.dart';
+import 'package:redux_shop_app/features/newSchool/new_school.dart';
+//import 'package:redux_shop_app/features/stub_screen.dart';
+//import 'package:redux_shop_app/localization.dart';
+
 void main() => runApp(MyApp());
 
 final GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
@@ -24,10 +34,9 @@ class MyApp extends StatelessWidget {
   MaterialPageRoute _getRoute(RouteSettings settings) {
     switch (settings.name) {
       case AppRoutes.home:
-        return MainRoute(MyHomePage(), settings: settings);
-      case AppRoutes.listSchools:
-        return FabRoute(NewGame(), settings: settings);
-
+        return MainRoute(HomePage(), settings: settings);
+      case AppRoutes.addSchool:
+        return FabRoute(NewSchool(), settings: settings);
     }
   }
 
@@ -36,19 +45,18 @@ class MyApp extends StatelessWidget {
     return StoreProvider(
       store: store,
       child: MaterialApp(
-        navigatorKey: navigatorKey, // navigator key allows us to navigate without need of context
+        navigatorKey:
+            navigatorKey, // navigator key allows us to navigate without need of context
         navigatorObservers: [routeObserver],
-        title: AppLocalizations.appTitle,
-        localizationsDelegates: [
-          AppLocalizationsDelegate(),
-        ],
+        title: 'Test',
         theme: theme,
         onGenerateRoute: (RouteSettings settings) => _getRoute(settings),
       ),
     );
   }
+}
 
-  class MainRoute<T> extends MaterialPageRoute<T> {
+class MainRoute<T> extends MaterialPageRoute<T> {
   MainRoute(Widget widget, {RouteSettings settings})
       : super(
             builder: (_) => RouteAwareWidget(child: widget),
@@ -63,4 +71,22 @@ class MyApp extends StatelessWidget {
     return FadeTransition(opacity: animation, child: child);
   }
 }
+
+class FabRoute<T> extends MaterialPageRoute<T> {
+  FabRoute(Widget widget, {RouteSettings settings})
+      : super(
+            builder: (_) => RouteAwareWidget(child: widget),
+            settings: settings);
+
+  @override
+  Widget buildTransitions(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
+    if (settings.isInitialRoute) return child;
+    return SlideTransition(
+        position: new Tween<Offset>(
+          begin: const Offset(0.0, 1.0),
+          end: Offset.zero,
+        ).animate(animation),
+        child: child);
+  }
 }

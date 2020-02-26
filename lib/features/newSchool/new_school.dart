@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class NewGame extends StatelessWidget {
+class NewSchool extends StatelessWidget {
   Widget _getBody(BuildContext context) => Center(
           child: Center(
         child: Column(
